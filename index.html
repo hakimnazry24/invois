@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InvoisCepat</title>
+    <link href="./output.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
+  </head>
+
+  <body class="bg-gray-200">
+    <button id="generate-pdf">Generate PDF</button>
+
+    <header class="flex justify-between items-center py-5 shadow-md px-20">
+      <a href="/"
+        ><span class="font-semibold text-black text-2xl">InvoisCepat</span
+        ><span class="text-xl text-gray-700">.com</span></a
+      >
+      <ul class="flex gap-x-7">
+        <li><a href="" class="">About</a></li>
+        <li><a href="" class="">Login</a></li>
+        <li>
+          <a
+            href=""
+            class="bg-blue-500 text-white font-semibold px-4 py-2 rounded-md"
+            >Sign Up</a
+          >
+        </li>
+      </ul>
+    </header>
+
+    <section class="bg-white rounded-md py-10 px-20">
+      <h1 class="text-2xl mb-3">
+        InvoisCepat - Jana Invois Dalam Sekelip Mata!
+      </h1>
+      <h2 class="w-1/3">
+        🚀 Hasilkan invois dengan hanya satu klik! Tak perlu lagi bersusah payah
+        buat invois secara manual. Dengan InvoisCepat, anda hanya perlu isi
+        butiran dan invois akan dijana secara automatik dalam format PDF –
+        profesional, kemas, dan sedia untuk dihantar kepada pelanggan!
+      </h2>
+    </section>
+
+    <section class="w-2/3 mx-auto bg-white my-8 p-4">
+      <form action="" method="post">
+        <div class="flex justify-between items-center mb-10">
+          <div>
+            <label for="logo" class="block">Add Your Logo</label>
+            <input
+              type="file"
+              name="logo"
+              id="logo"
+              class="w-48 h-32 bg-gray-300 cursor-pointer border border-dashed"
+            />
+          </div>
+          <div class="flex flex-col items-end">
+            <input
+              type="text"
+              name="invoice-title"
+              id="invoice-title"
+              value="INVOICE"
+              class="pl-8 border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[400px] h-20 mb-3 text-3xl"
+            />
+            <div class="relative">
+              <span
+                class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"
+                >#</span
+              >
+              <input
+                type="text"
+                class="pl-8 border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter text"
+                id="invoice-number"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-end">
+          <div>
+            <textarea
+              name="from"
+              id="from"
+              class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[400px]"
+              placeholder="Invois ini daripada siapa?"
+            ></textarea>
+            <label for="to" class="block">Kepada</label>
+            <textarea
+              name="to"
+              id="to"
+              placeholder="Untuk siapa invois ini?"
+              class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[400px]"
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="date" class="mr-5">Tarikh</label>
+            <input
+              type="date"
+              name="date"
+              id="invoice-date"
+              class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[400px]"
+            />
+          </div>
+        </div>
+
+        <div class="mt-10">
+          <table id="item-table">
+            <thead>
+              <tr class="bg-blue-500">
+                <th class="p-3 w-full text-left">Item</th>
+                <th class="p-3 text-left px-10">Kuantiti</th>
+                <th class="p-3 text-left px-10">Harga</th>
+                <th class="p-3 text-left px-10">Amaun (RM)</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>
+                  <input
+                    type="text"
+                    name="item-1"
+                    id="item-1"
+                    class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    name="quantity-1"
+                    id="quantity-1"
+                    class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    name="price-1"
+                    id="price-1"
+                    class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </td>
+                <td class="text-center" id="amount-1">0</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <button
+            type="button"
+            id="add-row-button"
+            class="border border-blue-500 text-blue-500 px-4 py-2 rounded-md mt-5 text-lg cursor-pointer mr-5"
+          >
+            + Item
+          </button>
+
+          <button
+            type="button"
+            id="remove-row-button"
+            class="border border-red-500 text-red-500 px-4 py-2 rounded-md mt-5 text-lg cursor-pointer"
+          >
+            - Item
+          </button>
+
+          <div class="grid grid-cols-3 mt-10 justify-between">
+            <div class="col-span-2">
+              <label for="notes" class="block">Nota</label>
+              <textarea
+                name="notes"
+                id="notes"
+                class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[600px]"
+                placeholder="Sebarang nota yang relevan"
+              ></textarea>
+
+              <label for="terms" class="block">Terma</label>
+              <textarea
+                name="terms"
+                id="terms"
+                class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[600px]"
+                placeholder="Terma dan syarat- pembayaran lewat, cara pembayaran dan sebagainya"
+              ></textarea>
+            </div>
+
+            <div class="col-span-1">
+              <div class="grid grid-cols-3 items-center mb-5">
+                <div class="col-span-1 justify-self-end">Subtotal</div>
+                <div id="Subtotal" class="justify-self-end col-span-2">RM0</div>
+              </div>
+
+              <div class="grid grid-cols-3 items-center mb-5">
+                <div class="col-span-1 justify-self-end">Discount</div>
+                <div class="justify-self-end col-span-2 relative">
+                  <input
+                    type="text"
+                    class="pr-1 border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-32"
+                  />
+                  <span
+                    class="absolute inset-y-0 right-2 flex items-center pl-3 text-gray-500"
+                    >%</span
+                  >
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 items-center mb-5">
+                <div class="col-span-1 justify-self-end">Total</div>
+                <div class="col-span-2 justify-self-end" id="total">RM0.00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button
+          class="bg-blue-500 px-8 py-4 rounded-md text-white font-semibold mt-5"
+          id="generate-pdf"
+        >
+          Jana Invois
+        </button>
+      </form>
+
+      <script>
+        // invoice title
+        const invoiceTitleInput = document.getElementById("invoice-title");
+        let invoiceTitle = "";
+        invoiceTitleInput.addEventListener("input", (event) => {
+          invoiceTitle = event.target.value;
+        });
+
+        //invoice number
+        const invoiceNumberInput = document.getElementById("invoice-number");
+        let invoiceNumber = "";
+        invoiceNumberInput.addEventListener("input", (event) => {
+          invoiceNumber = event.target.value;
+        });
+
+        // from
+        const fromInput = document.getElementById("from");
+        let from = "";
+        fromInput.addEventListener("input", (event) => {
+          from = event.target.value;
+        });
+
+        // to
+        const toInput = document.getElementById("to");
+        let to = "";
+        toInput.addEventListener("input", (event) => {
+          to = event.target.value;
+        });
+
+        //date
+        const invoiceDateInput = document.getElementById("invoice-date");
+        let invoiceDate;
+        let formattedInvoiceDate = "";
+        invoiceDateInput.addEventListener("change", () => {
+          const date = new Date(invoiceDateInput.value);
+          const year = date.getFullYear();
+          const month = (date.getMonth() + 1).toString().padStart(2, "0");
+          const day = date.getDate().toString().padStart(2, "0");
+
+          formattedInvoiceDate = `${day}/${month}/${year}`;
+        });
+
+        //items
+        document.addEventListener("DOMContentLoaded", () => {
+          function updateAmount(rowIndex) {
+            const itemInput = document.getElementById(`item-${rowIndex}`);
+            const quantityInput = document.getElementById(
+              `quantity-${rowIndex}`
+            );
+            const priceInput = document.getElementById(`price-${rowIndex}`);
+            const amountCell = document.getElementById(`amount-${rowIndex}`);
+
+            const item = itemInput.value;
+            const quantity = parseFloat(quantityInput.value) || 0;
+            const price = parseFloat(priceInput.value) || 0;
+            const amount = quantity * price;
+
+            amountCell.textContent = amount.toFixed(2);
+          }
+
+          function addListenerToRow(rowIndex) {
+            const itemInput = document.getElementById(`item-${rowIndex}`);
+            const quantityInput = document.getElementById(
+              `quantity-${rowIndex}`
+            );
+            const priceInput = document.getElementById(`price-${rowIndex}`);
+
+            itemInput.addEventListener("input", () => {
+              updateAmount(rowIndex);
+            });
+
+            quantityInput.addEventListener("input", () => {
+              updateAmount(rowIndex);
+            });
+
+            priceInput.addEventListener("input", () => {
+              updateAmount(rowIndex);
+            });
+          }
+
+          addListenerToRow(1);
+
+          // add row button
+          const addRowButton = document.getElementById("add-row-button");
+          function addRow() {
+            let tableBody = document
+              .getElementById("item-table")
+              .getElementsByTagName("tbody")[0];
+            let rowCount = tableBody.rows.length + 1;
+
+            let newRow = tableBody.insertRow();
+            newRow.innerHTML = `
+          <td><input type="text" name="item-${rowCount}" id="item-${rowCount}"
+            class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+            </td>
+            <td><input type="text" name="quantity-${rowCount}" id="quantity-${rowCount}"
+              class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </td>
+              <td><input type="text" name="price-${rowCount}" id="price-${rowCount}"
+                class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </td>
+                <td class="text-center" id="amount-${rowCount}">0</td>
+                `;
+
+            addListenerToRow(rowCount);
+          }
+          addRowButton.addEventListener("click", () => addRow());
+
+          // remove row button
+          const removeRowButton = document.getElementById("remove-row-button");
+          function removeRow() {
+            let tableBody = document
+              .getElementById("item-table")
+              .getElementsByTagName("tbody")[0];
+            let rowCount = tableBody.rows.length;
+
+            if (rowCount > 1) {
+              tableBody.deleteRow(rowCount - 1);
+            } else {
+              alert("At least one row must remain!");
+            }
+          }
+          removeRowButton.addEventListener("click", () => removeRow());
+        });
+
+        //notes
+        const notesInput = document.getElementById("notes");
+        let notes = "";
+        notesInput.addEventListener("input", (event) => {
+          notes = event.target.value;
+        });
+
+        //terms
+        const termsInput = document.getElementById("terms");
+        let terms = "";
+        termsInput.addEventListener("input", (event) => {
+          terms = event.target.value;
+        });
+
+        // generate pdf
+        document
+          .getElementById("generate-pdf")
+          .addEventListener("click", function () {
+            const doc = new jsPDF();
+
+            doc.text("Hello world!", 10, 100);
+            doc.text("This is a PDF generated with jsPDF", 10, 20);
+
+            doc.save("generated.pdf");
+          });
+      </script>
+    </section>
+  </body>
+</html>
