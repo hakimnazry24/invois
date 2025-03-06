@@ -9,8 +9,6 @@
   </head>
 
   <body class="bg-gray-200">
-    <button id="generate-pdf">Generate PDF</button>
-
     <header class="flex justify-between items-center py-5 shadow-md px-20">
       <a href="/"
         ><span class="font-semibold text-black text-2xl">InvoisCepat</span
@@ -41,7 +39,7 @@
       </h2>
     </section>
 
-    <section class="w-2/3 mx-auto bg-white my-8 p-4">
+    <section class="w-3/4 2xl:w-2/3 mx-auto bg-white my-8 p-8">
       <form action="" method="post">
         <div class="flex justify-between items-center mb-10">
           <div>
@@ -99,7 +97,7 @@
               type="date"
               name="date"
               id="invoice-date"
-              class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[400px]"
+              class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[200px]"
             />
           </div>
         </div>
@@ -108,10 +106,10 @@
           <table id="item-table">
             <thead>
               <tr class="bg-blue-500">
-                <th class="p-3 w-full text-left">Item</th>
-                <th class="p-3 text-left px-10">Kuantiti</th>
-                <th class="p-3 text-left px-10">Harga</th>
-                <th class="p-3 text-left px-10">Amaun (RM)</th>
+                <th class="p-3 w-full text-left rounded-tl-md">Item</th>
+                <th class="p-3 text-center px-10">Kuantiti</th>
+                <th class="p-3 text-center px-10">Harga</th>
+                <th class="p-3 text-center px-10 rounded-tr-md">Amaun (RM)</th>
               </tr>
             </thead>
 
@@ -192,6 +190,7 @@
                 <div class="justify-self-end col-span-2 relative">
                   <input
                     type="text"
+                    id="discount"
                     class="pr-1 border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-32"
                   />
                   <span
@@ -209,7 +208,8 @@
           </div>
         </div>
         <button
-          class="bg-blue-500 px-8 py-4 rounded-md text-white font-semibold mt-5"
+          type="button"
+          class="bg-blue-500 px-8 py-4 rounded-md text-white font-semibold mt-5 cursor-pointer"
           id="generate-pdf"
         >
           Jana Invois
@@ -217,45 +217,68 @@
       </form>
 
       <script>
+        function calculateSubtotal(items) {
+          let subtotal = 0;
+          items.forEach((item) => {
+            subtotal += item.quantity * item.price;
+          });
+
+          return subtotal;
+        }
+
+        function calculateTotal(subtotal, discountPercent) {
+          let total = 0;
+          total = subtotal * discountPercent;
+
+          return total;
+        }
+
+        let invoiceInfo = {
+          title: "",
+          number: "",
+          from: "",
+          to: "",
+          date: "",
+          items: [{ item: "", quantity: 0, price: 0 }],
+          notes: "",
+          terms: "",
+          discount: 0,
+        };
+
         // invoice title
         const invoiceTitleInput = document.getElementById("invoice-title");
-        let invoiceTitle = "";
         invoiceTitleInput.addEventListener("input", (event) => {
-          invoiceTitle = event.target.value;
+          invoiceInfo.title = event.target.value;
+          console.log(event.target.value);
         });
 
         //invoice number
         const invoiceNumberInput = document.getElementById("invoice-number");
-        let invoiceNumber = "";
         invoiceNumberInput.addEventListener("input", (event) => {
-          invoiceNumber = event.target.value;
+          invoiceInfo.number = event.target.value;
         });
 
         // from
         const fromInput = document.getElementById("from");
-        let from = "";
         fromInput.addEventListener("input", (event) => {
-          from = event.target.value;
+          invoiceInfo.from = event.target.value;
         });
 
         // to
         const toInput = document.getElementById("to");
-        let to = "";
         toInput.addEventListener("input", (event) => {
-          to = event.target.value;
+          invoiceInfo.to = event.target.value;
         });
 
         //date
         const invoiceDateInput = document.getElementById("invoice-date");
-        let invoiceDate;
-        let formattedInvoiceDate = "";
         invoiceDateInput.addEventListener("change", () => {
           const date = new Date(invoiceDateInput.value);
           const year = date.getFullYear();
           const month = (date.getMonth() + 1).toString().padStart(2, "0");
           const day = date.getDate().toString().padStart(2, "0");
 
-          formattedInvoiceDate = `${day}/${month}/${year}`;
+          invoiceInfo.date = `${day}/${month}/${year}`;
         });
 
         //items
@@ -268,11 +291,19 @@
             const priceInput = document.getElementById(`price-${rowIndex}`);
             const amountCell = document.getElementById(`amount-${rowIndex}`);
 
-            const item = itemInput.value;
-            const quantity = parseFloat(quantityInput.value) || 0;
-            const price = parseFloat(priceInput.value) || 0;
-            const amount = quantity * price;
+            const updatedItem = {
+              item: "",
+              quantity: 0,
+              price: 0,
+            };
 
+            updatedItem.item = itemInput.value;
+            updatedItem.quantity = parseFloat(quantityInput.value) || 0;
+            updatedItem.price = parseFloat(priceInput.value) || 0;
+
+            invoiceInfo.items[rowIndex - 1] = updatedItem;
+
+            const amount = updatedItem.quantity * updatedItem.price;
             amountCell.textContent = amount.toFixed(2);
           }
 
@@ -308,10 +339,10 @@
 
             let newRow = tableBody.insertRow();
             newRow.innerHTML = `
-          <td><input type="text" name="item-${rowCount}" id="item-${rowCount}"
-            class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
-            </td>
-            <td><input type="text" name="quantity-${rowCount}" id="quantity-${rowCount}"
+              <td><input type="text" name="item-${rowCount}" id="item-${rowCount}"
+              class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+              </td>
+              <td><input type="text" name="quantity-${rowCount}" id="quantity-${rowCount}"
               class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
               </td>
               <td><input type="text" name="price-${rowCount}" id="price-${rowCount}"
@@ -321,6 +352,12 @@
                 `;
 
             addListenerToRow(rowCount);
+
+            invoiceInfo.items.push({
+              item: "",
+              quantity: 0,
+              price: 0,
+            });
           }
           addRowButton.addEventListener("click", () => addRow());
 
@@ -334,6 +371,7 @@
 
             if (rowCount > 1) {
               tableBody.deleteRow(rowCount - 1);
+              invoiceInfo.items.pop();
             } else {
               alert("At least one row must remain!");
             }
@@ -343,29 +381,30 @@
 
         //notes
         const notesInput = document.getElementById("notes");
-        let notes = "";
         notesInput.addEventListener("input", (event) => {
-          notes = event.target.value;
+          invoiceInfo.notes = event.target.value;
         });
 
         //terms
         const termsInput = document.getElementById("terms");
-        let terms = "";
         termsInput.addEventListener("input", (event) => {
-          terms = event.target.value;
+          invoiceInfo.terms = event.target.value;
+        });
+
+        //discount
+        const discountInput = document.getElementById("discount");
+        discountInput.addEventListener("input", (event) => {
+          invoiceInfo.discount = parseFloat(event.target.value);
         });
 
         // generate pdf
-        document
-          .getElementById("generate-pdf")
-          .addEventListener("click", function () {
-            const doc = new jsPDF();
-
-            doc.text("Hello world!", 10, 100);
-            doc.text("This is a PDF generated with jsPDF", 10, 20);
-
-            doc.save("generated.pdf");
-          });
+        const generatePdfButton = document.getElementById("generate-pdf");
+        generatePdfButton.addEventListener("click", function () {
+          const doc = new jsPDF();
+          doc.text("Hello world!", 10, 100);
+          doc.text("This is a PDF generated with jsPDF", 10, 20);
+          doc.save("generated.pdf");
+        });
       </script>
     </section>
   </body>
